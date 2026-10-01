@@ -4,7 +4,7 @@ A Stripe payout reconciliation monitor built on a double-entry ledger.
 
 **Live:** https://payout-ledger-gamma.vercel.app
 
-> **Status: work in progress.** Webhook ingestion, the ledger and the payout state machine are built and tested. Reconciliation, the dashboard and the event simulator are not built yet. See [docs/PLAN.md](docs/PLAN.md).
+> **Status: work in progress.** Webhook ingestion, the ledger, the payout state machine and reconciliation are built and tested. The dashboard, the event simulator and alerts are not built yet. See [docs/PLAN.md](docs/PLAN.md).
 
 ## What it will do
 

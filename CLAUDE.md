@@ -20,6 +20,7 @@ Run all six checks before every commit.
 - `src/events` — webhook verification, inbox, applying events to the ledger
 - `src/ledger` — posting balanced transactions
 - `src/payouts` — payout state machine
+- `src/reconcile` — compare source and local state, track mismatches
 - `src/db` — Prisma client and database tests (`*.db.test.ts`)
 - `prisma/` — schema and migrations; invariants are raw SQL in the migration, described in `docs/schema.md`
 - `docs/PLAN.md` — checklist; update it after each feature

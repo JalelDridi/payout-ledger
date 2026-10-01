@@ -11,6 +11,9 @@ Tables are defined in [`prisma/schema.prisma`](../prisma/schema.prisma). The rul
 | `ledger_transactions` | One money movement (charge, transfer, payout, payout reversal), with idempotency key. |
 | `payouts`             | Current state of each payout, built from events by a forward-only state machine.      |
 | `ledger_entries`      | The signed amounts that make up a transaction. Integer minor units (cents).           |
+| `source_objects`      | What the payment provider says exists; the reconciliation source (ADR 8).             |
+| `mismatches`          | Differences found by reconciliation, open or resolved.                                |
+| `reconciliation_runs` | One row per run, with counts.                                                         |
 
 ## How money is recorded
 
@@ -36,6 +39,7 @@ The `external` account represents everything outside the system (card networks, 
 | `accounts.balance` equals the sum of its entries   | Trigger `ledger_entries_apply_balance` updates it on every insert                         |
 | A balance never goes negative unless allowed       | `CHECK accounts_balance_non_negative`                                                     |
 | Ledger rows are never changed or removed           | Triggers `ledger_entries_append_only` and `ledger_transactions_append_only`               |
+| One open mismatch per object and type              | Partial unique index `mismatches_one_open_per_object_and_type`                            |
 
 The "sum to zero" check is deferred to commit time so that the entries of one transaction can be inserted one by one.
 

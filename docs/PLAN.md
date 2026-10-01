@@ -27,7 +27,8 @@
 
 - [x] Concurrency tests against real Postgres (Docker locally, service container in CI)
 - [x] Property-based test: any delivery order reaches the same final state
-- [ ] Reconciler with mismatch classification
+- [x] Reconciler with mismatch classification (ADR 8)
+- [x] Mismatches open, refresh and resolve across runs; concurrent runs are safe
 
 ## Demo surface
 
