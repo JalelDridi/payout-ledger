@@ -4,9 +4,9 @@ A Stripe payout reconciliation monitor built on a double-entry ledger.
 
 **Live:** https://payout-ledger-gamma.vercel.app
 
-> **Status: work in progress.** Webhook ingestion, the ledger, the payout state machine and reconciliation are built and tested. The dashboard, the event simulator and alerts are not built yet. See [docs/PLAN.md](docs/PLAN.md).
+> **Status: feature-complete, documentation in progress.** The live demo has a simulator that sends duplicate, out-of-order and dropped webhooks. This README will become a full case study. See [docs/PLAN.md](docs/PLAN.md).
 
-## What it will do
+## What it does
 
 - Ingest Stripe webhooks idempotently: signature verification, dedupe by event ID, out-of-order handling.
 - Record charges, transfers and payouts in a double-entry ledger whose balances cannot go negative, even under concurrent writes.

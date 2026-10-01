@@ -32,11 +32,12 @@
 
 ## Demo surface
 
-- [ ] Dashboard: payout health, failed and stuck payouts
-- [ ] Event simulator (duplicate, out-of-order, dropped)
-- [ ] Alert feed
-- [ ] Scheduled reconciliation and "run now"
-- [ ] Rate limiting and nightly reset to seed data
+- [x] Dashboard: summary, alerts, mismatches, payouts, webhook inbox
+- [x] Event simulator: normal, duplicate, out-of-order, dropped, failed, stuck
+- [x] Alerts for failed payouts, stuck payouts and unprocessable events
+- [x] Checks run on a schedule (GitHub Actions, every 15 minutes) and on demand
+- [x] Global simulator budget and a cooldown on manual checks
+- [x] Nightly reset that reseeds the demo (Vercel Cron)
 
 ## Hardening and docs
 
@@ -48,5 +49,6 @@
 
 - [ ] Real Stripe test-mode account alongside the simulator
 - [ ] Slack or Discord alert webhook
+- [ ] Stripe API as a second reconciliation source
 - [ ] Measured concurrency result in the README
 - [ ] Demo GIF

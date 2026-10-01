@@ -6,7 +6,7 @@ Stripe payout reconciliation monitor built on a double-entry ledger. Public port
 
 ## Commands
 
-- `pnpm dev` — run locally
+- `pnpm dev` — run locally (uses the Docker database via `.env.development.local`)
 - `pnpm db:up` — start local Postgres (Docker, port 5433)
 - `pnpm lint` · `pnpm format:check` · `pnpm typecheck` · `pnpm test` · `pnpm test:db` · `pnpm build` — the CI checks, in order
 - New migration: `DATABASE_URL_UNPOOLED=postgresql://postgres:postgres@localhost:5433/payout_ledger_test pnpm exec prisma migrate dev --name <name>`. Without the override, Prisma targets the Neon database from `.env.local`.
@@ -20,6 +20,8 @@ Run all six checks before every commit.
 - `src/events` — webhook verification, inbox, applying events to the ledger
 - `src/ledger` — posting balanced transactions
 - `src/payouts` — payout state machine
+- `src/alerts`, `src/jobs` — alert detection; the periodic checks
+- `src/simulator`, `src/demo` — demo scenarios; nightly reset
 - `src/reconcile` — compare source and local state, track mismatches
 - `src/db` — Prisma client and database tests (`*.db.test.ts`)
 - `prisma/` — schema and migrations; invariants are raw SQL in the migration, described in `docs/schema.md`
