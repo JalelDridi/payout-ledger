@@ -9,6 +9,7 @@ Tables are defined in [`prisma/schema.prisma`](../prisma/schema.prisma). The rul
 | `stripe_events`       | Webhook inbox. Raw event, keyed by Stripe's event ID, with processing status.         |
 | `accounts`            | Ledger accounts: `external` (the outside world), `platform`, and one per seller.      |
 | `ledger_transactions` | One money movement (charge, transfer, payout, payout reversal), with idempotency key. |
+| `payouts`             | Current state of each payout, built from events by a forward-only state machine.      |
 | `ledger_entries`      | The signed amounts that make up a transaction. Integer minor units (cents).           |
 
 ## How money is recorded
@@ -39,3 +40,15 @@ The `external` account represents everything outside the system (card networks, 
 The "sum to zero" check is deferred to commit time so that the entries of one transaction can be inserted one by one.
 
 The balance trigger's `UPDATE` takes the account's row lock. Two concurrent writers to the same account therefore run one after the other, and the second sees the first's result before the CHECK is evaluated. See [ADR 3](decisions/0003-concurrency-row-locks-with-constraint-backstop.md).
+
+## How an event becomes ledger entries
+
+| Event                                  | Effect                                                                      |
+| -------------------------------------- | --------------------------------------------------------------------------- |
+| `charge.succeeded`                     | `external` → `platform`                                                     |
+| `transfer.created`                     | `platform` → `seller:<account>`                                             |
+| `payout.*`, first seen while in flight | `seller:<account>` → `external`                                             |
+| `payout.failed` / `payout.canceled`    | If the payout had been debited, a reversal: `external` → `seller:<account>` |
+| anything else                          | Stored and marked `ignored`                                                 |
+
+Ledger writes are keyed by the Stripe object (`charge:<id>`, `transfer:<id>`, `payout:<id>:debit`, `payout:<id>:reversal`), so the same object described by several events is posted once.

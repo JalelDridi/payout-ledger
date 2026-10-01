@@ -17,6 +17,9 @@ Run all six checks before every commit.
 ## Layout
 
 - `src/app` — Next.js App Router (pages and route handlers)
+- `src/events` — webhook verification, inbox, applying events to the ledger
+- `src/ledger` — posting balanced transactions
+- `src/payouts` — payout state machine
 - `src/db` — Prisma client and database tests (`*.db.test.ts`)
 - `prisma/` — schema and migrations; invariants are raw SQL in the migration, described in `docs/schema.md`
 - `docs/PLAN.md` — checklist; update it after each feature

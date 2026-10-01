@@ -16,16 +16,17 @@
 
 ## Ingestion and ledger
 
-- [ ] Webhook endpoint: signature verification, dedupe on event ID
-- [ ] Event inbox: stored raw, processed once
-- [ ] Double-entry ledger with database-enforced invariants
-- [ ] Tests: duplicate and out-of-order events
+- [x] Webhook endpoint: signature verification, dedupe on event ID
+- [x] Event inbox: stored raw, processed exactly once
+- [x] Ledger posting with sorted row locks and idempotency keys
+- [x] Payout state machine that only moves forward
+- [x] Retry sweep for events that arrive before what they depend on (ADR 7)
+- [x] Tests: duplicate, out-of-order and concurrent delivery
 
 ## Correctness
 
-- [ ] Concurrency tests against real Postgres (Docker locally, service container in CI)
-- [ ] Property-based tests for ledger invariants
-- [ ] Idempotency keys on write endpoints; replay tests
+- [x] Concurrency tests against real Postgres (Docker locally, service container in CI)
+- [x] Property-based test: any delivery order reaches the same final state
 - [ ] Reconciler with mismatch classification
 
 ## Demo surface
