@@ -1,0 +1,21 @@
+name: Scheduled checks
+
+# Vercel's Hobby plan runs cron jobs at most once a day, so the periodic
+# checks are triggered from here instead (ADR 6).
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Retry events, reconcile, raise alerts
+        run: |
+          curl --fail-with-body --silent --show-error --max-time 90 \
+            -X POST "$APP_URL/api/jobs/run" \
+            -H "Authorization: Bearer $CRON_SECRET"
+        env:
+          APP_URL: https://payout-ledger-gamma.vercel.app
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
