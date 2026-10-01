@@ -7,7 +7,8 @@
 - [x] Health endpoint
 - [x] ADR 1 — scope
 - [x] Deployed to Vercel (https://payout-ledger-gamma.vercel.app)
-- [ ] Neon database connected (pooled connection)
+- [x] Neon database created and reachable locally (pooled and direct)
+- [ ] `DATABASE_URL` set in Vercel
 - [ ] ADRs 2–6 decided and written
 - [ ] Schema drafted
 
