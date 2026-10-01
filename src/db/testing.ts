@@ -23,6 +23,6 @@ export function createTestClient(): PrismaClient {
 
 export async function resetDatabase(db: PrismaClient): Promise<void> {
   await db.$executeRawUnsafe(
-    'TRUNCATE "ledger_entries", "ledger_transactions", "accounts", "payouts", "stripe_events" RESTART IDENTITY CASCADE',
+    'TRUNCATE "ledger_entries", "ledger_transactions", "accounts", "payouts", "stripe_events", "source_objects", "mismatches", "reconciliation_runs" RESTART IDENTITY CASCADE',
   );
 }

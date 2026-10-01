@@ -131,3 +131,59 @@ model Payout {
   @@index([connectedAccountId])
   @@map("payouts")
 }
+
+enum ObjectKind {
+  charge
+  transfer
+  payout
+}
+
+enum MismatchType {
+  missing_locally
+  missing_at_source
+  amount_mismatch
+  status_mismatch
+}
+
+/// What the payment provider says exists. The simulator writes here when it
+/// "creates" an object, whether or not the matching webhook is delivered, so
+/// this table plays the role of the Stripe API for reconciliation.
+model SourceObject {
+  id                 String        @id
+  kind               ObjectKind
+  connectedAccountId String?       @map("connected_account_id")
+  amount             BigInt
+  status             PayoutStatus?
+  updatedAt          DateTime      @map("updated_at") @db.Timestamptz
+
+  @@map("source_objects")
+}
+
+model ReconciliationRun {
+  id             String   @id @default(uuid()) @db.Uuid
+  startedAt      DateTime @map("started_at") @db.Timestamptz
+  finishedAt     DateTime @map("finished_at") @db.Timestamptz
+  objectsChecked Int      @map("objects_checked")
+  opened         Int
+  stillOpen      Int      @map("still_open")
+  resolved       Int
+
+  @@index([startedAt])
+  @@map("reconciliation_runs")
+}
+
+/// A difference between the source and this system. At most one open
+/// mismatch per object and type (partial unique index in the migration).
+model Mismatch {
+  id         String       @id @default(uuid()) @db.Uuid
+  objectId   String       @map("object_id")
+  objectKind ObjectKind   @map("object_kind")
+  type       MismatchType
+  details    Json
+  detectedAt DateTime     @map("detected_at") @db.Timestamptz
+  lastSeenAt DateTime     @map("last_seen_at") @db.Timestamptz
+  resolvedAt DateTime?    @map("resolved_at") @db.Timestamptz
+
+  @@index([resolvedAt])
+  @@map("mismatches")
+}
