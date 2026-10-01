@@ -1,0 +1,99 @@
+// Constraints and triggers that Prisma cannot express live in the migration
+// SQL and are described in docs/schema.md.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum EventSource {
+  stripe
+  simulator
+}
+
+enum AccountKind {
+  external
+  platform
+  seller
+}
+
+enum TransactionKind {
+  charge
+  transfer
+  payout
+  payout_reversal
+}
+
+/// Webhook inbox. The Stripe event ID is the primary key, so a duplicate
+/// delivery is an insert conflict.
+model StripeEvent {
+  id          String      @id
+  type        String
+  source      EventSource
+  apiCreated  DateTime    @map("api_created") @db.Timestamptz
+  payload     Json
+  receivedAt  DateTime    @default(now()) @map("received_at") @db.Timestamptz
+  processedAt DateTime?   @map("processed_at") @db.Timestamptz
+  attempts    Int         @default(0)
+  lastError   String?     @map("last_error")
+
+  transactions LedgerTransaction[]
+
+  @@index([processedAt, apiCreated])
+  @@map("stripe_events")
+}
+
+/// A ledger account. `balance` is a cache of the sum of its entries,
+/// maintained by a trigger and guarded by a CHECK constraint.
+model Account {
+  id                 String      @id @default(uuid()) @db.Uuid
+  code               String      @unique
+  kind               AccountKind
+  connectedAccountId String?     @unique @map("connected_account_id")
+  allowNegative      Boolean     @default(false) @map("allow_negative")
+  balance            BigInt      @default(0)
+  createdAt          DateTime    @default(now()) @map("created_at") @db.Timestamptz
+
+  entries LedgerEntry[]
+
+  @@map("accounts")
+}
+
+/// One money movement. Its entries must sum to zero (deferred constraint
+/// trigger). `idempotencyKey` makes a replayed write a conflict.
+model LedgerTransaction {
+  id             String          @id @default(uuid()) @db.Uuid
+  kind           TransactionKind
+  stripeObjectId String          @map("stripe_object_id")
+  sourceEventId  String?         @map("source_event_id")
+  idempotencyKey String          @unique @map("idempotency_key")
+  createdAt      DateTime        @default(now()) @map("created_at") @db.Timestamptz
+
+  sourceEvent StripeEvent?  @relation(fields: [sourceEventId], references: [id])
+  entries     LedgerEntry[]
+
+  @@index([stripeObjectId])
+  @@index([sourceEventId])
+  @@map("ledger_transactions")
+}
+
+/// One side of a transaction. Amounts are signed integer minor units
+/// (cents). Rows are append-only.
+model LedgerEntry {
+  id            BigInt   @id @default(autoincrement())
+  transactionId String   @map("transaction_id") @db.Uuid
+  accountId     String   @map("account_id") @db.Uuid
+  amount        BigInt
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  transaction LedgerTransaction @relation(fields: [transactionId], references: [id])
+  account     Account           @relation(fields: [accountId], references: [id])
+
+  @@index([transactionId])
+  @@index([accountId])
+  @@map("ledger_entries")
+}
