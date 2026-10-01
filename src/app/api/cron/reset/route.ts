@@ -2,6 +2,8 @@ import { isAuthorized } from "@/auth";
 import { getDb } from "@/db/client";
 import { resetDemo } from "@/demo/reset";
 
+export const maxDuration = 60;
+
 // Called nightly by Vercel Cron (see vercel.json), which uses GET.
 export async function GET(request: Request) {
   if (!isAuthorized(request)) {
