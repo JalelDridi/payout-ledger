@@ -8,9 +8,11 @@
 - [x] ADR 1 — scope
 - [x] Deployed to Vercel (https://payout-ledger-gamma.vercel.app)
 - [x] Neon database created and reachable locally (pooled and direct)
-- [ ] `DATABASE_URL` set in Vercel
-- [ ] ADRs 2–6 decided and written
-- [ ] Schema drafted
+- [x] `DATABASE_URL` set in Vercel
+- [x] ADRs 2–6 decided and written
+- [x] Schema: inbox and ledger tables, first migration
+- [x] Database-enforced invariants, tested against real Postgres in CI
+- [ ] Migration applied to the Neon database
 
 ## Ingestion and ledger
 

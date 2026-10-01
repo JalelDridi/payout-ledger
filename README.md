@@ -4,7 +4,7 @@ A Stripe payout reconciliation monitor built on a double-entry ledger.
 
 **Live:** https://payout-ledger-gamma.vercel.app
 
-> **Status: work in progress.** The foundation (app, CI, health endpoint) is in place. Webhook ingestion, the ledger, reconciliation and the dashboard are not built yet. See [docs/PLAN.md](docs/PLAN.md).
+> **Status: work in progress.** The database schema and its invariants are in place and tested. Webhook ingestion, ledger posting, reconciliation and the dashboard are not built yet. See [docs/PLAN.md](docs/PLAN.md).
 
 ## What it will do
 
@@ -16,20 +16,27 @@ A Stripe payout reconciliation monitor built on a double-entry ledger.
 
 ## Run locally
 
+Needs Node 22+, pnpm and Docker.
+
 ```bash
 pnpm install
+pnpm db:up        # local Postgres on port 5433
+pnpm test:db      # applies migrations, then runs the database tests
 pnpm dev
 ```
 
 ## Checks
 
 ```bash
-pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm build
+pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:db && pnpm build
 ```
 
-## Decisions
+`pnpm test` runs unit tests. `pnpm test:db` runs tests that need a real Postgres, including concurrent writes; they refuse to run against a non-local database.
 
-Architectural decisions are recorded in [docs/decisions](docs/decisions).
+## Design
+
+- [Schema and database-enforced invariants](docs/schema.md)
+- [Architectural decisions](docs/decisions)
 
 ## Licence
 
