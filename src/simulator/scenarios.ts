@@ -72,7 +72,7 @@ export type ScenarioContext = {
   random: () => number;
 };
 
-const SECONDS = { fiveMinutes: 300, threeDays: 3 * 24 * 3600 };
+const SECONDS = { fiveMinutes: 300, threeDays: 3 * 24 * 3600 + 600 };
 
 export function buildScenario(
   kind: ScenarioKind,
