@@ -187,3 +187,24 @@ model Mismatch {
   @@index([resolvedAt])
   @@map("mismatches")
 }
+
+enum AlertType {
+  payout_failed
+  payout_stuck
+  event_unprocessable
+}
+
+/// Something a person should look at. An alert is open while its condition
+/// holds; at most one open alert per type and subject (partial unique index
+/// in the migration).
+model Alert {
+  id         String    @id @default(uuid()) @db.Uuid
+  type       AlertType
+  subjectId  String    @map("subject_id")
+  message    String
+  raisedAt   DateTime  @map("raised_at") @db.Timestamptz
+  resolvedAt DateTime? @map("resolved_at") @db.Timestamptz
+
+  @@index([resolvedAt])
+  @@map("alerts")
+}
