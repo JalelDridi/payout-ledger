@@ -6,7 +6,7 @@
 - [x] CI: lint, format, typecheck, test, build
 - [x] Health endpoint
 - [x] ADR 1 — scope
-- [ ] Deployed to Vercel
+- [x] Deployed to Vercel (https://payout-ledger-gamma.vercel.app)
 - [ ] Neon database connected (pooled connection)
 - [ ] ADRs 2–6 decided and written
 - [ ] Schema drafted
