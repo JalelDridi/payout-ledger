@@ -28,18 +28,33 @@ enum TransactionKind {
   payout_reversal
 }
 
+enum EventOutcome {
+  applied
+  stale
+  ignored
+}
+
+enum PayoutStatus {
+  pending
+  in_transit
+  paid
+  failed
+  canceled
+}
+
 /// Webhook inbox. The Stripe event ID is the primary key, so a duplicate
 /// delivery is an insert conflict.
 model StripeEvent {
-  id          String      @id
+  id          String        @id
   type        String
   source      EventSource
-  apiCreated  DateTime    @map("api_created") @db.Timestamptz
+  apiCreated  DateTime      @map("api_created") @db.Timestamptz
   payload     Json
-  receivedAt  DateTime    @default(now()) @map("received_at") @db.Timestamptz
-  processedAt DateTime?   @map("processed_at") @db.Timestamptz
-  attempts    Int         @default(0)
-  lastError   String?     @map("last_error")
+  receivedAt  DateTime      @default(now()) @map("received_at") @db.Timestamptz
+  processedAt DateTime?     @map("processed_at") @db.Timestamptz
+  outcome     EventOutcome?
+  attempts    Int           @default(0)
+  lastError   String?       @map("last_error")
 
   transactions LedgerTransaction[]
 
@@ -96,4 +111,23 @@ model LedgerEntry {
   @@index([transactionId])
   @@index([accountId])
   @@map("ledger_entries")
+}
+
+/// Current state of a Stripe payout, built from events by a state machine
+/// that only moves forward (ADR 5).
+model Payout {
+  id                 String       @id
+  connectedAccountId String       @map("connected_account_id")
+  amount             BigInt
+  currency           String
+  status             PayoutStatus
+  failureCode        String?      @map("failure_code")
+  arrivalDate        DateTime?    @map("arrival_date") @db.Timestamptz
+  statusChangedAt    DateTime     @map("status_changed_at") @db.Timestamptz
+  createdAt          DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt          DateTime     @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([status, statusChangedAt])
+  @@index([connectedAccountId])
+  @@map("payouts")
 }
