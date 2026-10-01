@@ -12,7 +12,7 @@
 - [x] ADRs 2–6 decided and written
 - [x] Schema: inbox and ledger tables, first migration
 - [x] Database-enforced invariants, tested against real Postgres in CI
-- [ ] Migration applied to the Neon database
+- [x] Migration applied to the Neon database on deploy
 
 ## Ingestion and ledger
 
