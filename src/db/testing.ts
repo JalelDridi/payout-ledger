@@ -1,5 +1,6 @@
 import type { PrismaClient } from "@/generated/prisma/client";
 import { createClient } from "./client";
+import { truncateAll } from "./truncate";
 
 export const TEST_DATABASE_URL =
   process.env.TEST_DATABASE_URL ??
@@ -22,7 +23,5 @@ export function createTestClient(): PrismaClient {
 }
 
 export async function resetDatabase(db: PrismaClient): Promise<void> {
-  await db.$executeRawUnsafe(
-    'TRUNCATE "ledger_entries", "ledger_transactions", "accounts", "payouts", "stripe_events", "source_objects", "mismatches", "reconciliation_runs" RESTART IDENTITY CASCADE',
-  );
+  await truncateAll(db);
 }
