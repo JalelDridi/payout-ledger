@@ -120,6 +120,10 @@ Next.js (App Router) and TypeScript on Vercel, PostgreSQL on Neon, Prisma, Strip
 3. Add refunds, with their own reversing entries.
 4. A per-seller statement built from ledger entries.
 
+## Author
+
+Built by [Mohamed Jalel Dridi](https://jaleldridi.vercel.app).
+
 ## Licence
 
 MIT
