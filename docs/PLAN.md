@@ -41,14 +41,15 @@
 
 ## Hardening and docs
 
-- [ ] Error tracking, structured logs
-- [ ] Playwright smoke test
-- [ ] README case study: live link, screenshot, architecture diagram, decisions, failure modes, limitations
+- [x] Structured logs; health check reports database reachability
+- [x] Optional error tracking (Sentry), active once a DSN is set
+- [x] Playwright smoke tests and accessibility scan, in CI
+- [x] README case study: live link, screenshot, architecture diagram, decisions, failure modes, limitations
 
 ## If time allows
 
 - [ ] Real Stripe test-mode account alongside the simulator
 - [ ] Slack or Discord alert webhook
 - [ ] Stripe API as a second reconciliation source
-- [ ] Measured concurrency result in the README
+- [x] Measured concurrency result in the README
 - [ ] Demo GIF

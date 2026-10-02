@@ -6,13 +6,13 @@ Stripe payout reconciliation monitor built on a double-entry ledger. Public port
 
 ## Commands
 
-- `pnpm dev` — run locally (uses the Docker database via `.env.development.local`)
+- `pnpm dev` — run locally (uses the Docker database via `.env.development`)
 - `pnpm db:up` — start local Postgres (Docker, port 5433)
-- `pnpm lint` · `pnpm format:check` · `pnpm typecheck` · `pnpm test` · `pnpm test:db` · `pnpm build` — the CI checks, in order
+- `pnpm lint` · `pnpm format:check` · `pnpm typecheck` · `pnpm test` · `pnpm test:db` · `pnpm build` · `pnpm test:e2e` — the CI checks, in order
 - New migration: `DATABASE_URL_UNPOOLED=postgresql://postgres:postgres@localhost:5433/payout_ledger_test pnpm exec prisma migrate dev --name <name>`. Without the override, Prisma targets the Neon database from `.env.local`.
 - `pnpm format` — apply Prettier
 
-Run all six checks before every commit.
+Run all seven checks before every commit.
 
 ## Layout
 
