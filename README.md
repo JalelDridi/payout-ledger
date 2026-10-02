@@ -21,27 +21,22 @@ A system that trusts each webhook as it arrives will, sooner or later, pay a sel
 ## How it works
 
 ```mermaid
-flowchart LR
-    S[Stripe test mode] -->|signed webhook| W
-    Sim[Simulator] -->|signed webhook| W
-    Sim -.->|records what really happened| Src[(Source objects)]
+flowchart TD
+    Src["Stripe test mode<br/>or the simulator"] -->|signed webhook| W["Webhook endpoint<br/>verifies the signature"]
+    W --> I[("Event inbox<br/>one row per event ID")]
+    I --> P["Processor<br/>applies each event exactly once"]
+    P --> L[("Double-entry ledger<br/>never negative")]
+    P --> SM["Payout state machine<br/>forward only"]
 
-    W[Webhook endpoint<br/>verify signature] --> I[(Event inbox<br/>one row per event ID)]
-    I --> P[Processor<br/>apply exactly once]
-    P --> SM[Payout state machine<br/>forward only]
-    P --> L[(Double-entry ledger<br/>never negative)]
-
-    J[Scheduled checks<br/>every 15 min] --> R[Retry waiting events]
-    J --> Rec[Reconciler]
-    J --> A[Alert detection]
-    Src --> Rec
+    J["Scheduled checks<br/>every 15 minutes"] --> Retry["Retry waiting events"]
+    J --> Rec["Reconciler<br/>provider's record vs ledger"]
+    J --> Al["Alert detection<br/>failed and stuck payouts"]
+    Retry --> P
     L --> Rec
-    Rec --> M[(Mismatches)]
-    A --> Al[(Alerts)]
+    SM --> Al
 
-    M --> D[Dashboard]
+    Rec --> D["Dashboard"]
     Al --> D
-    L --> D
 ```
 
 1. **Receive.** The endpoint verifies the `Stripe-Signature` header against the raw body, then stores the event. The event ID is the primary key, so a duplicate is rejected by the database.
