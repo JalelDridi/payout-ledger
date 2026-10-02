@@ -6,3 +6,5 @@ AGENTS.md
 src/generated
 .claude
 skills-lock.json
+test-results
+playwright-report

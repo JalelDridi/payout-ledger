@@ -49,3 +49,7 @@ skills-lock.json
 
 # generated Prisma client
 /src/generated/
+
+# playwright
+/test-results/
+/playwright-report/
