@@ -2,6 +2,7 @@ import { ZodError } from "zod";
 import { getDb } from "@/db/client";
 import { processEvent, storeEvent } from "@/events/inbox";
 import { InvalidSignatureError, verifyWebhook } from "@/events/verify";
+import { log } from "@/log";
 
 export async function POST(request: Request) {
   const secrets = {
@@ -27,6 +28,7 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     if (error instanceof InvalidSignatureError) {
+      log("webhook.rejected", { reason: "invalid_signature" });
       return Response.json({ error: "Invalid signature" }, { status: 400 });
     }
     if (error instanceof ZodError) {
@@ -37,12 +39,19 @@ export async function POST(request: Request) {
 
   const db = getDb();
   const stored = await storeEvent(db, verified.event, verified.source);
+  const fields = {
+    id: verified.event.id,
+    type: verified.event.type,
+    source: verified.source,
+  };
   if (!stored) {
+    log("webhook.duplicate", fields);
     return Response.json({ received: true, duplicate: true });
   }
 
   // The event is safely stored, so the sender gets a 200 whatever happens
   // next. If processing fails, the scheduled sweep retries it.
   const result = await processEvent(db, verified.event.id);
+  log("webhook.received", { ...fields, result });
   return Response.json({ received: true, duplicate: false, result });
 }

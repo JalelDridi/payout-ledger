@@ -1,6 +1,7 @@
 import type { Prisma, PrismaClient } from "@/generated/prisma/client";
 import type { EventOutcome, EventSource } from "@/generated/prisma/enums";
 import { applyEvent } from "./apply";
+import { log } from "@/log";
 import { EventEnvelope } from "./schema";
 
 /** After this many failures an event is left for a human to look at. */
@@ -72,6 +73,7 @@ export async function processEvent(
       where: { id },
       data: { attempts: { increment: 1 }, lastError: message.slice(0, 500) },
     });
+    log("event.failed", { id, error: message.slice(0, 200) });
     return "failed";
   }
 }
