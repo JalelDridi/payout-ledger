@@ -17,7 +17,11 @@ import {
 
 export type ActionResult = { ok: boolean; message: string } | null;
 
-/** Checks can be triggered by anyone, so space them out. */
+/**
+ * Checks can be triggered by anyone, so repeated presses are spaced out.
+ * The cooldown is skipped when webhooks arrived since the last run, so a
+ * visitor who just sent a scenario is never refused.
+ */
 const CHECK_COOLDOWN_MS = 3000;
 
 /** Single entry point for the panel, so it shows one result at a time. */
@@ -63,7 +67,12 @@ async function runChecks(): Promise<ActionResult> {
     orderBy: { finishedAt: "desc" },
   });
   if (last && Date.now() - last.finishedAt.getTime() < CHECK_COOLDOWN_MS) {
-    return { ok: false, message: "The checks ran a moment ago." };
+    const newEvents = await db.stripeEvent.count({
+      where: { receivedAt: { gt: last.finishedAt } },
+    });
+    if (newEvents === 0) {
+      return { ok: false, message: "The checks ran a moment ago." };
+    }
   }
 
   const { sweep, reconciliation, alerts } = await runJobs(db);
